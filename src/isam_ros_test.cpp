@@ -16,7 +16,7 @@ ros::NodeHandle n;
 
 kparams_t params;
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.0,0.1);
+std::normal_distribution<double> distribution(0.0,1.0);
 
 Isam myIsam;
 sMatrix4 tempPose;
@@ -24,24 +24,9 @@ sMatrix6 tempCov;
 myIsam.init(tempPose);
 
 
-// int j=0,jj=0;
-// while(j<4)
-// {
-// while(jj<4)
-// {
-//     tempPose(j,jj)=j+jj;
-//     jj++;
-// }
-// j++;
-// }
-// tempPose(0,0)=1;
-// std::cout<<"TEMP COV "<<std::endl;
-// std::cout<<tempPose<<std::endl;
-// std::cout<<inverse(tempPose)<<std::endl;
-
 
 float3 *keyVert, *prevKeyVert;
-int size = 1;
+int size = 5;
 keyVert = (float3*) malloc(sizeof(float3)*size);
 prevKeyVert = (float3*) malloc(sizeof(float3)*size);
 int i=0;
@@ -49,21 +34,69 @@ int i=0;
 std::vector<int> source_corr, target_corr;
 source_corr.resize(size);
 target_corr.resize(size);
-while(i<size)
-{
+
+
     double number = distribution(generator);
     std::cout<<"number "<<number<<std::endl;
-    //number=0;
-    keyVert[i].x = i+1 + number;
-    keyVert[i].y = i+1 + number;
-    keyVert[i].z = i+1 + number;
-    prevKeyVert[i].x = i+0.01;
-    prevKeyVert[i].y = i+0.01;
-    prevKeyVert[i].z = i+0.01;
-    source_corr[i] = i;
-    target_corr[i] = i;
-    i++;
-}
+    keyVert[0].x = 1.21 + number;
+    keyVert[0].y = 1.33 + number;
+    keyVert[0].z = 1.11 + number;
+    prevKeyVert[0].x = 0.01;
+    prevKeyVert[0].y = 0.01;
+    prevKeyVert[0].z = 0.01;
+    source_corr[0] = 0;
+    target_corr[0] = 0;
+
+
+    number = distribution(generator);
+    std::cout<<"number "<<number<<std::endl;
+    keyVert[1].x = 1.0 + number;
+    keyVert[1].y = 1.0 + number;
+    keyVert[1].z = 1.0 + number;
+    prevKeyVert[1].x = 0.01 ;
+    prevKeyVert[1].y = 0.01 ;
+    prevKeyVert[1].z = 0.01;
+    source_corr[1] = 1;
+    target_corr[1] = 1;
+
+
+    number = distribution(generator);
+    std::cout<<"number "<<number<<std::endl;
+    keyVert[2].x = 1.0 + number;
+    keyVert[2].y = 1.0 + number;
+    keyVert[2].z = 1.0 + number;
+    prevKeyVert[2].x = 0.1 ;
+    prevKeyVert[2].y = 0.1;
+    prevKeyVert[2].z = 0.1 ;
+    source_corr[2] = 2;
+    target_corr[2] = 2;
+
+
+    number = distribution(generator);
+    std::cout<<"number "<<number<<std::endl;
+    keyVert[3].x = 1.0 + number;
+    keyVert[3].y = 1.0 + number;
+    keyVert[3].z = 1.0 + number;
+    prevKeyVert[3].x = 0.01 ;
+    prevKeyVert[3].y = 0.01 ;
+    prevKeyVert[3].z = 0.01 ;
+    source_corr[3] = 3;
+    target_corr[3] = 3;
+
+
+
+    number = distribution(generator);
+    std::cout<<"number "<<number<<std::endl;
+    keyVert[4].x = 1.0 + number;
+    keyVert[4].y = 1.0 + number;
+    keyVert[4].z = 1.0 + number;
+    prevKeyVert[4].x = 0.01 ;
+    prevKeyVert[4].y = 0.01 ;
+    prevKeyVert[4].z = 0.01 ;
+    source_corr[4] = 4;
+    target_corr[4] = 4;
+
+
 tempPose(0,3)=0.99;
 tempPose(1,3)=0.99;
 tempPose(2,3)=0.99;
