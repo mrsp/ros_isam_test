@@ -23,8 +23,12 @@ include_directories(include
 )
 
 add_executable(isam_ros_test src/isam_ros_test.cpp src/Isam.cpp )
-
 target_link_libraries(isam_ros_test
+    ${catkin_LIBRARIES}  
+    isam cholmod   ${Eigen3_LIBRARIES} 
+)
+add_executable(isam_ros_data src/isam_ros_data.cpp src/Isam.cpp )
+target_link_libraries(isam_ros_data
     ${catkin_LIBRARIES}  
     isam cholmod   ${Eigen3_LIBRARIES} 
 )
