@@ -1,18 +1,8 @@
-/*
-
- Copyright (c) 2014 University of Edinburgh, Imperial College, University of Manchester.
- Developed in the PAMELA project, EPSRC Programme Grant EP/K008730/1
-
- This code is licensed under the MIT License.
-
- */
-
 #ifndef CONSTANT_PARAMETERS_H_
 #define CONSTANT_PARAMETERS_H_
 
 ////////////////////////// COMPILATION PARAMETERS //////////////////////
 
-#include <vector>
 
 
 const float cov_small=1e-10;
@@ -30,8 +20,7 @@ const float farPlane = 4.0f;
 
 
 const float delta = 4.0f;
-const float3 light = make_float3(1, 1, -1.0);
-const float3 ambient = make_float3(0.1, 0.1, 0.1);
+
 
 const float PI = 3.14159265358979323846;
 #endif /* CONSTANT_PARAMETERS_H_ */

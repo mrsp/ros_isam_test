@@ -1,8 +1,6 @@
 #ifndef KPARAMS_H
 #define KPARAMS_H
 
-#include <vector_types.h>
-#include"cutil_math.h"
 #include<vector>
 
 typedef struct
@@ -16,11 +14,6 @@ typedef struct
     float cov_small=0;
     float cov_big=0;
 
-    uint3 volume_resolution = make_uint3(256,256,256);
-    //uint3 volume_resolution = make_uint3(512,512,512);    
-    float3 volume_direction = make_float3(4.0,4.0,4.0);
-    float3 volume_size = make_float3(8,8,8);
-
 
 
 
@@ -28,9 +21,6 @@ typedef struct
     float mu = 0.1;
     float icp_threshold = 1e-5;
 
-    uint2 inputSize;
-    uint2 computationSize;
-    float4 camera;
 
 
 
