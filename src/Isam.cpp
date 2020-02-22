@@ -242,7 +242,7 @@ Point3d Isam::toIsamPoint(const Vector3d &f)
 {
 //    Vector3d p=fromVisionCordV(f);
     Vector3d p=f;
-    return Point3d((float) p(0), (float) p(1), (float) p(2));
+    return Point3d(p(0), p(1),p(2));
 }
 
 Pose3d Isam::toIsamPose(const Affine3d &pose)
