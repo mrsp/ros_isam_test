@@ -81,7 +81,7 @@ int main(int argc, char **argv)
     
     Eigen::MatrixXd ICP_COV =  Eigen::MatrixXd::Zero(6,6);
     ICP_COV = computeICPCovPoint2Point(corrVec0, corrVec1,  sensor_noise_cov,  transform);
-    landMarkCov = ICP_COV.block<3,3>(3,3);
+    landMarkCov = ICP_COV.block<3,3>(0,0);
     std::cout<<"ICP Covariance"<<std::endl;
     std::cout<<ICP_COV<<std::endl;
 
