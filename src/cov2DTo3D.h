@@ -22,7 +22,9 @@ Eigen::MatrixXd computeCov2DTo3D(Eigen::MatrixXd cov2D, double depth, double fx,
     Qz(2,2) = depth_noise_cov;
 
     cov3D.noalias() = F*cov2D*F.transpose();
+
     cov3D.noalias() += L*Qz*L.transpose();
+
     return cov3D;
 }
 

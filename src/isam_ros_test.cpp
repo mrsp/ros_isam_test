@@ -2,7 +2,7 @@
 #include "Isam.h"
 #include "kparams.h"
 #include <random>
-
+#include "cov2DTo3D.h"
 int main(int argc, char** argv)
 {
 
@@ -21,6 +21,19 @@ myIsam.init(tempPose,tempCov);
 int originPoseIdx = 0;
 
 
+std::cout<<"Testing 2D - 3D Covariance propagation"<<std::endl;
+Eigen::MatrixXd cov2D = Eigen::MatrixXd::Identity(2,2)*1e-2;
+std::cout<<"Cov2D "<<cov2D<<std::endl;
+
+double depth_noise_cov = 0.02;
+double fx = 500; //in mm
+double fy = 500; //in mm
+double cx = 240;
+double cy = 320;  
+double depth  = 4500; //in mm
+MatrixXd cov3D = computeCov2DTo3D(cov2D,  depth,  fx,  fy,  cx,  cy,  depth_noise_cov);
+
+std::cout<<"Cov3D "<<cov3D<<std::endl;
 //True Displacement:
 Vector3d trueDist = Vector3d(0.99,0.99,0.99);
 
