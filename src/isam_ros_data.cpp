@@ -23,6 +23,8 @@ int main(int argc, char **argv)
 
     Matrix3d landMarkCov = Matrix3d::Identity() * LandMarkNoiseStd*LandMarkNoiseStd; //Setting Landmark Covariance
 
+    
+    
 
 
     //ROS
@@ -31,16 +33,22 @@ int main(int argc, char **argv)
 
     kparams_t params;
     Isam myIsam(params);
-    myIsam.init(readPoseEigen(initialFrame), initialISAMCov);
+    Affine3d  origin=readPoseEigen(initialFrame);
+    myIsam.init(origin, initialISAMCov);
 
+    Affine3d prevPose=origin;
+    
     int i = initialFrame + 1;
     while (i < finalKeyFrame + 1)
     {
         //Add Factor to the Graph
         Affine3d tempPose = readPoseEigen(i);
-        tempPose.translation() += Vector3d(distribution(generator),distribution(generator),distribution(generator));
+        Affine3d delta= prevPose.inverse()*tempPose;
+        delta.translation() += Vector3d(distribution(generator),distribution(generator),distribution(generator));
 
-        myIsam.addFrame(tempPose, frameCov);
+        Affine3d newPose=prevPose*delta;
+        prevPose=newPose;
+        myIsam.addFrame(newPose, frameCov);
         i++;
     }
     cout << "Added Factors " << i << endl;
