@@ -69,7 +69,7 @@ int main(int argc, char **argv)
     std::cout<<"ICP Covariance"<<std::endl;
     std::cout<<ICP_COV<<std::endl;
 
-    landMarkCov = ICP_COV.block<3,3>(3,3);
+    landMarkCov = ICP_COV.block<3,3>(0,0);
     i = 0;
     while (i < corr.size())
     {
