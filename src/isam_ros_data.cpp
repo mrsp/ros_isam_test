@@ -64,19 +64,35 @@ int main(int argc, char **argv)
 
     Affine3d  transform = readPoseEigen(finalKeyFrame).inverse() * readPoseEigen(firstKeyFrame);
     double sensor_noise_cov = 0.02;
+
+
+    vector<Vector3d> corrVec0;
+    vector<Vector3d> corrVec1;
+    i = 0;
+    while (i < corr.size())
+    {
+        landMarkPosFromPose0 = points0[corr[i].from];
+        landMarkPosFromPose1 = points1[corr[i].to];
+        
+        corrVec0.push_back(points0[corr[i].from]);
+        corrVec1.push_back(points1[corr[i].to]);
+        i++;
+    }
+    
     Eigen::MatrixXd ICP_COV =  Eigen::MatrixXd::Zero(6,6);
-    ICP_COV = computeICPCovPoint2Point(points0, points1,  sensor_noise_cov,  transform);
+    ICP_COV = computeICPCovPoint2Point(corrVec0, corrVec1,  sensor_noise_cov,  transform);
+    landMarkCov = ICP_COV.block<3,3>(3,3);
     std::cout<<"ICP Covariance"<<std::endl;
     std::cout<<ICP_COV<<std::endl;
 
-    landMarkCov = ICP_COV.block<3,3>(0,0);
+
     i = 0;
     while (i < corr.size())
     {
 
         landIdx = myIsam.addLandmark(Vector3d::Zero());
-        landMarkPosFromPose0 = points0[corr[i].from];
-        landMarkPosFromPose1 = points1[corr[i].to];
+        landMarkPosFromPose0 = corrVec0[i];
+        landMarkPosFromPose1 = corrVec1[i];
 
         myIsam.connectLandmark(landMarkPosFromPose0, landIdx, firstKeyFrame - initialFrame, landMarkCov);
 
