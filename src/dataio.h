@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#define DATA_DIR "/home/master/Desktop/data"
+#define DATA_DIR "/home/tavu/catkin_ws/src/ros_isam_test/data_2frames/"
 using namespace std;
 
 struct descr_t

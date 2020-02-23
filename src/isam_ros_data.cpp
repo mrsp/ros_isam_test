@@ -4,14 +4,44 @@
 #include <random>
 #include "dataio.h"
 #include "covPoint2Point.h"
+
+#include"cov2DTo3D.h"
+
+Eigen::MatrixXd computeCov2DTo3DfromVert(Eigen::MatrixXd cov2D, Vector3d vertex, Matrix3d cam, double depth_noise_cov)
+{
+//     Vector3d v(vertex.x,vertex.y,vertex.z);
+    Vector3d tmp=cam*vertex;
+    double depth=tmp[2];
+    double fx=cam(0,0);
+    double fy=cam(1,1);
+    double cx=cam(0,2);
+    double cy=cam(1,2);
+    
+    
+    Eigen::MatrixXd cov=computeCov2DTo3D(cov2D,depth,fx,fy,cx,cy,depth_noise_cov);
+    return cov;
+
+}
+
 int main(int argc, char **argv)
 {
     int initialFrame = 10; //from where to initialize ISAM
     int firstKeyFrame = 25; 
     int finalKeyFrame = 50;
 
-  
+    double fx=481.2;
+    double fy=480;
+    double cx=319.5;
+    double cy=239.5;
 
+    Matrix3d camMatrix=Matrix3d::Identity();
+    camMatrix(0,0)=fx;
+    camMatrix(1,1)=fy;
+    camMatrix(0,2)=cx;
+    camMatrix(1,2)=cy;
+    
+    
+    
     //Gaussian Noise
     double factorNoiseStd = 0.01;
     double LandMarkNoiseStd = 0.01;
@@ -60,6 +90,9 @@ int main(int argc, char **argv)
     vector<Vector3d> points0 = readPointsEigen(firstKeyFrame);
     vector<Vector3d> points1 = readPointsEigen(finalKeyFrame);
     vector<corr_t> corr = readCorr(firstKeyFrame, finalKeyFrame);
+    
+    vector<descr_t> descr0 = readDescr(firstKeyFrame);
+    vector<descr_t> descr1 = readDescr(finalKeyFrame);
 
 
     Affine3d  transform = readPoseEigen(finalKeyFrame).inverse() * readPoseEigen(firstKeyFrame);
@@ -93,10 +126,24 @@ int main(int argc, char **argv)
         landIdx = myIsam.addLandmark(Vector3d::Zero());
         landMarkPosFromPose0 = corrVec0[i];
         landMarkPosFromPose1 = corrVec1[i];
+        
+        descr_t d0=descr0[corr[i].from];
+        descr_t d1=descr0[corr[i].to];
+        
+        double radio0=d0.size/2;
+        double radio1=d1.size/2;
+        
+        Matrix2d cov2d0=Matrix2d::Identity()*radio0*radio0;
+        Matrix2d cov2d1=Matrix2d::Identity()*radio1*radio1;
+        
+        Matrix3d landMarkCov0=computeCov2DTo3DfromVert(cov2d0,landMarkPosFromPose0,camMatrix,sensor_noise_cov);
+        Matrix3d landMarkCov1=computeCov2DTo3DfromVert(cov2d1,landMarkPosFromPose1,camMatrix,sensor_noise_cov);
 
-        myIsam.connectLandmark(landMarkPosFromPose0, landIdx, firstKeyFrame - initialFrame, landMarkCov);
-
-        myIsam.connectLandmark(landMarkPosFromPose1, landIdx, finalKeyFrame - initialFrame, landMarkCov);
+        std::cout<<landMarkCov0<<std::endl;
+        std::cout<<landMarkCov1<<std::endl;
+        
+        myIsam.connectLandmark(landMarkPosFromPose0, landIdx, firstKeyFrame - initialFrame, landMarkCov0);
+        myIsam.connectLandmark(landMarkPosFromPose1, landIdx, finalKeyFrame - initialFrame, landMarkCov1);
 
         i++;
     }

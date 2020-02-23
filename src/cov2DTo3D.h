@@ -1,4 +1,3 @@
-
 #include <eigen3/Eigen/Dense>
 #include <vector>
 #include <iostream>
