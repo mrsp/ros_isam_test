@@ -12,7 +12,7 @@
 #include <iostream>
 
 
-Eigen::MatrixXd computeICPCovPoint2Point(std::vector<Eigen::Vector3d>& data_pi, std::vector<Eigen::Vector3d>& model_qi, double sensor_noise_cov, Eigen::Matrix4d& transform)
+Eigen::MatrixXd computeICPCovPoint2Point(std::vector<Eigen::Vector3d>& data_pi, std::vector<Eigen::Vector3d>& model_qi, double sensor_noise_cov, Eigen::Affine3d& transform)
 {
 
     double Tx = transform(0,3);
@@ -279,7 +279,6 @@ Eigen::MatrixXd computeICPCovPoint2Point(std::vector<Eigen::Vector3d>& data_pi, 
 
     }// End of the FOR loop!!!
 
-    std::cout << "\n**************\n Successfully Computed d2J_dX2 \n**************\n" << std::endl;
 
 
 
@@ -555,12 +554,7 @@ Eigen::MatrixXd computeICPCovPoint2Point(std::vector<Eigen::Vector3d>& data_pi, 
     Eigen::MatrixXd ICP_COV = Eigen::MatrixXd::Zero(6,6);
     ICP_COV =  d2J_dX2.inverse() * d2J_dZdX * cov_z * d2J_dZdX.transpose() * d2J_dX2.inverse();
 
-
-
-
-    std::cout << "\n\n********************** \n\n" << "ICP_COV = \n" << ICP_COV <<"\n*******************\n\n"<< std::endl;
-
-    std::cout << "\nSuccessfully Computed the ICP's Covariance !!!\n" << std::endl;
+    return ICP_COV;
 }
 
 

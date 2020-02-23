@@ -10,7 +10,7 @@
 #include <vector>
 #include <iostream>
 
-Eigen::MatrixXd computeICPCovPoint2Plane(std::vector<Eigen::Vector3d>& data_pi, std::vector<Eigen::Vector3d>& model_qi, std::vector<Eigen::Vector3d>& model_qi_normals, double sensor_noise_cov, Eigen::Matrix4d& transform)
+Eigen::MatrixXd computeICPCovPoint2Plane(std::vector<Eigen::Vector3d>& data_pi, std::vector<Eigen::Vector3d>& model_qi, std::vector<Eigen::Vector3d>& model_qi_normals, double sensor_noise_cov, Eigen::Affine3d& transform)
 {
 
     double Tx = transform(0,3);
@@ -554,7 +554,7 @@ Eigen::MatrixXd computeICPCovPoint2Plane(std::vector<Eigen::Vector3d>& data_pi, 
     std::cout << "\n\n********************** \n\n" << "ICP_COV = \n" << ICP_COV <<"\n*******************\n\n"<< std::endl;
 
     std::cout << "\nSuccessfully Computed the ICP's Covariance !!!\n" << std::endl;
-
+    return ICP_COV;
 }
 
 

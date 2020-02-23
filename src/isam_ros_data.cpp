@@ -3,7 +3,7 @@
 #include "kparams.h"
 #include <random>
 #include "dataio.h"
-
+#include "covPoint2Point.h"
 int main(int argc, char **argv)
 {
     int initialFrame = 10; //from where to initialize ISAM
@@ -13,7 +13,7 @@ int main(int argc, char **argv)
   
 
     //Gaussian Noise
-    double factorNoiseStd = 0.1;
+    double factorNoiseStd = 0.01;
     double LandMarkNoiseStd = 0.01;
     std::default_random_engine generator;
     std::normal_distribution<double> distribution(0.0,factorNoiseStd);
@@ -44,6 +44,7 @@ int main(int argc, char **argv)
         //Add Factor to the Graph
         Affine3d tempPose = readPoseEigen(i);
         Affine3d delta= prevPose.inverse()*tempPose;
+
         delta.translation() += Vector3d(distribution(generator),distribution(generator),distribution(generator));
 
         Affine3d newPose=prevPose*delta;
@@ -60,6 +61,15 @@ int main(int argc, char **argv)
     vector<Vector3d> points1 = readPointsEigen(finalKeyFrame);
     vector<corr_t> corr = readCorr(firstKeyFrame, finalKeyFrame);
 
+
+    Affine3d  transform = readPoseEigen(finalKeyFrame).inverse() * readPoseEigen(firstKeyFrame);
+    double sensor_noise_cov = 0.02;
+    Eigen::MatrixXd ICP_COV =  Eigen::MatrixXd::Zero(6,6);
+    ICP_COV = computeICPCovPoint2Point(points0, points1,  sensor_noise_cov,  transform);
+    std::cout<<"ICP Covariance"<<std::endl;
+    std::cout<<ICP_COV<<std::endl;
+
+    landMarkCov = ICP_COV.block<3,3>(3,3);
     i = 0;
     while (i < corr.size())
     {
