@@ -17,7 +17,7 @@ Eigen::MatrixXd computeCov2DTo3DfromVert(Eigen::MatrixXd cov2D, Vector3d vertex,
     double cx=cam(0,2);
     double cy=cam(1,2);
     
-    
+
     Eigen::MatrixXd cov=computeCov2DTo3D(cov2D,depth,fx,fy,cx,cy,depth_noise_cov);
     return cov;
 
