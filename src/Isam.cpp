@@ -148,15 +148,14 @@ void Isam::addPoseConstrain(int p1, int p2, const Affine3d &delta, const Matrix<
 double Isam::optimize(int frame)
 {
     //std::cout<<"Start isam optimization"<<std::endl;
-
-    //char buf[32];
-    //sprintf(buf,"data/isam/f_%d_graph",frame);
-    //slam->save(buf);
+    char buf[32];
+    sprintf(buf,"/home/master/Desktop/graph/f_%d_graph",frame);
+    slam->save(buf);
 
     slam->batch_optimization();
 
-    //sprintf(buf,"data/isam/f_%d_graph_opt",frame);
-    //slam->save(buf);
+    sprintf(buf,"/home/master/Desktop/graph/f_%d_graph_opt",frame);
+    slam->save(buf);
     slam->write(std::cout);
     //slam->print_stats();
 
@@ -173,10 +172,13 @@ void Isam::init(const Affine3d &initialPose, const Matrix<double, 6, 6> &cov)
 
     //Disable isam prints
     isam::Properties props = slam->properties();
-    props.max_iterations = 10;
-    props.quiet = true;
+    props.max_iterations = 10000;
+    props.quiet = false;
+    props.verbose = true;
+
     //props.method = DOG_LEG;
-    props.method = LEVENBERG_MARQUARDT;
+    //props.method = LEVENBERG_MARQUARDT;
+    props.method = GAUSS_NEWTON;
     slam->set_properties(props);
 
     Pose3d_Node *initial_pose_node = new Pose3d_Node();
