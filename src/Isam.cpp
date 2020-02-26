@@ -90,7 +90,7 @@ int Isam::addLandmark(Vector3d pos)
 
     return ret;
 }
-
+using namespace std;
 void Isam::connectLandmark(Vector3d pos, int landIdx, int poseIdx, Matrix3d &cov)
 {
     if (poseIdx < 0)
@@ -99,12 +99,16 @@ void Isam::connectLandmark(Vector3d pos, int landIdx, int poseIdx, Matrix3d &cov
     Point3d point = toIsamPoint(pos);
 
     Noise noise = isam::Covariance(cov);
-
+    //cout << "CREAH" << landmarks.size() << " " << landIdx << endl;
+    // cout << "BEFORE FACTOR" << landmarks[landIdx]->value() << endl;
     Pose3d_Point3d_Factor *f = new Pose3d_Point3d_Factor(
         pose_nodes[poseIdx], landmarks[landIdx], point, noise);
+    //cout << "MID FACTOR" << pose_nodes[poseIdx]->value0() << endl;// landmarks[landIdx]->value() << endl;
 
     landmarkFactors.push_back(f);
     slam->add_factor(f);
+    //cout << "AFTER FACTOR" << landmarks[landIdx]->value0() << endl;
+
 }
 
 void Isam::addFixPose(const Affine3d &fixPose)
@@ -153,7 +157,7 @@ double Isam::optimize(int frame)
 
     //sprintf(buf,"data/isam/f_%d_graph_opt",frame);
     //slam->save(buf);
-
+    slam->write(std::cout);
     //slam->print_stats();
 
     double error = slam->chi2();

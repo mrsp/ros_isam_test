@@ -145,15 +145,13 @@ vector<corr_t> readCorr(int from, int to)
 {
     vector<corr_t> ret;
     char buf[128];
-    sprintf(buf, "%s/feat/corr_from%dto%d.txt", DATA_DIR, from, to);
+    sprintf(buf, "%s/feat/MATCH%d%d.txt", DATA_DIR, from, to);
     std::ifstream infile(buf, std::ifstream::in);
     while (infile.good())
     {
         corr_t c;
 
         infile >> c.from;
-        
-
         infile >> c.to;
         ret.push_back(c);
     }

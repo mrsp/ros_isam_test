@@ -61,7 +61,7 @@ class Isam :public PoseGraph
 
         static isam::Point3d toIsamPoint(const Vector3d &f);
 
-    private:
+    public:
         isam::Slam *slam;
         const kparams_t &params;
 
