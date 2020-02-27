@@ -90,7 +90,7 @@ vector<Vector3d> readPointsEigen(int frame)
     vector<Vector3d> ret;
 
     char buf[128];
-    sprintf(buf, "%s/vert/vert%d.txt", DATA_DIR, frame);
+    sprintf(buf, "%s/feat/points%d.txt", DATA_DIR, frame);
     std::ifstream infile(buf, std::ifstream::in);
     while (infile.good())
     {
@@ -104,6 +104,30 @@ vector<Vector3d> readPointsEigen(int frame)
     return ret;
 };
 
+vector<Matrix3d> readCovEigen(int frame)
+{
+    vector<Matrix3d> ret;
+
+    char buf[128];
+    sprintf(buf, "%s/feat/cov%d.txt", DATA_DIR, frame);
+    std::ifstream infile(buf, std::ifstream::in);
+    while (infile.good())
+    {
+        Matrix3d p;
+        infile >> p(0,0);
+        infile >> p(0,1);
+        infile >> p(0,2);
+        infile >> p(1,0);
+        infile >> p(1,1);
+        infile >> p(1,2);
+        infile >> p(2,0);
+        infile >> p(2,1);
+        infile >> p(2,2);   
+        ret.push_back(p);
+    }
+    infile.close();
+    return ret;
+};
 
 
 vector<Vector3d> readNormalsEigen(int frame)
@@ -145,7 +169,7 @@ vector<corr_t> readCorr(int from, int to)
 {
     vector<corr_t> ret;
     char buf[128];
-    sprintf(buf, "%s/feat/MATCH%d%d.txt", DATA_DIR, from, to);
+    sprintf(buf, "%s/feat/corr_from_%d_to%d.txt", DATA_DIR, from, to);
     std::ifstream infile(buf, std::ifstream::in);
     while (infile.good())
     {
