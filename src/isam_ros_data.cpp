@@ -23,7 +23,7 @@ Eigen::MatrixXd computeCov2DTo3DfromVert(Eigen::MatrixXd cov2D, Vector3d vertex,
 
 
 
-#define USE_FIX_LANDMARK_COV 1
+#define USE_FIX_LANDMARK_COV 0
 
 
 int main(int argc, char **argv)
@@ -45,12 +45,12 @@ int main(int argc, char **argv)
     camMatrix(1,2)=cy;
     
     
-    
+    double outlierTH = 0.005;
     //Gaussian Noise
-    double factorTranslationNoiseStd = 1e-3;
+    double factorTranslationNoiseStd = 1e-2;
     double factorOrientationNoiseStd = 1e-2;
 
-    double LandMarkNoiseStd = 1e-2;
+    double LandMarkNoiseStd = 1e-4;
     double depth_sensor_noise_cov = 0.02;
 
     std::default_random_engine generator;
@@ -183,6 +183,14 @@ int main(int argc, char **argv)
     // //Landmarks in Keyframe FirstKeyframe -- MidKeyFrame 
     i=0;
    
+    Affine3d gt0 = GT[initialFrame-initialFrame];
+    Affine3d gt1 = GT[firstKeyFrame-initialFrame];
+    Vector3d w0=Vector3d::Zero();
+    Vector3d w1=Vector3d::Zero();
+    ofstream corr00,corr01;
+    corr00.open ("/home/master/Desktop/corr00.txt");
+    corr01.open ("/home/master/Desktop/corr01.txt");
+
     while(i<corr0.size())
     {
       
@@ -191,10 +199,23 @@ int main(int argc, char **argv)
         // landMarkPosFromPose0 =tempDist0;
         //Vector3d tempDist1 = gt1.inverse()*tempDist_;
         //landMarkPosFromPose1 = tempDist1;
+        w0  = gt0 * corrVec00[i];
+        w1  = gt1 * corrVec01[i];
+
+        corr00<<w0(0)<<" "<<w0(1)<<" "<<w0(2)<<std::endl;
+        corr01<<w1(0)<<" "<<w1(1)<<" "<<w1(2)<<std::endl;
+
+
         landMarkPosFromPose0 = corrVec00[i];
         landMarkCov0 = corrCov00[i];
         landMarkPosFromPose1 = corrVec01[i];
         landMarkCov1 = corrCov01[i];
+        i++;
+
+        if(fabs(w0(0)-w1(0))>outlierTH ||fabs(w0(1)-w1(1))>outlierTH || fabs(w0(2)-w1(2))>outlierTH)
+            continue;
+
+
         landIdx = myIsam.addLandmark(Vector3d::Zero());
          #if USE_FIX_LANDMARK_COV
          myIsam.connectLandmark(landMarkPosFromPose0, landIdx,  initialFrame - initialFrame, LandMarkCov);
@@ -204,16 +225,19 @@ int main(int argc, char **argv)
          myIsam.connectLandmark(landMarkPosFromPose1, landIdx,  firstKeyFrame - initialFrame, landMarkCov1);
          #endif
 
-        i++;
     }
-   
+    corr00.close();
+    corr01.close();
     //Landmarks in Keyframe FirstKeyframe -- MidKeyFrame 
     i=0;
-  
+    ofstream corr11,corr12;
+    corr11.open ("/home/master/Desktop/corr11.txt");
+    corr12.open ("/home/master/Desktop/corr12.txt");
+    gt0 = GT[firstKeyFrame-initialFrame];
+    gt1 = GT[midKeyFrame-initialFrame];
     while(i<corr1.size())
     {
        
-        landIdx = myIsam.addLandmark(Vector3d::Zero());
        
         // Vector3d tempDist_ = Vector3d(i+10+1.00,i+10+1.00,i+10+1.00);
         // Vector3d tempDist0 = gt0.inverse() * tempDist_;
@@ -222,11 +246,32 @@ int main(int argc, char **argv)
         //  landMarkPosFromPose1 = tempDist1;
 
 
+
+        w0  = gt0 * corrVec11[i];
+        w1  = gt1 * corrVec12[i];
+
+        corr11<<w0(0)<<" "<<w0(1)<<" "<<w0(2)<<std::endl;
+        corr12<<w1(0)<<" "<<w1(1)<<" "<<w1(2)<<std::endl;
+
+
         landMarkPosFromPose0 = corrVec11[i];
         landMarkPosFromPose1 = corrVec12[i];
         landMarkCov0 = corrCov11[i];
         landMarkCov1 = corrCov12[i];
-        
+
+        i++;
+        if(fabs(w0(0)-w1(0))>outlierTH ||fabs(w0(1)-w1(1))>outlierTH || fabs(w0(2)-w1(2))>outlierTH)
+            continue;
+
+
+
+
+        landIdx = myIsam.addLandmark(Vector3d::Zero());
+
+        // cout<<"Cov 0 "<<endl;
+        // cout<<landMarkCov0<<endl;
+        // cout<<"Cov 1 "<<endl;
+        // cout<<landMarkCov1<<endl;
         #if USE_FIX_LANDMARK_COV
         myIsam.connectLandmark(landMarkPosFromPose0, landIdx, firstKeyFrame - initialFrame,  LandMarkCov);
         myIsam.connectLandmark(landMarkPosFromPose1, landIdx, midKeyFrame - initialFrame, LandMarkCov);
@@ -234,15 +279,18 @@ int main(int argc, char **argv)
         myIsam.connectLandmark(landMarkPosFromPose0, landIdx, firstKeyFrame - initialFrame, landMarkCov0);
         myIsam.connectLandmark(landMarkPosFromPose1, landIdx, midKeyFrame - initialFrame, landMarkCov1);
         #endif
-        i++;
     }
-
-
+    cout<<" LANDMARK SIZE "<< myIsam.landmarks.size() << endl;
+    corr11.close();
+    corr12.close();
     //Landmarks in Keyframe FirstKeyframe -- FinalKeyFrame 
     i=0;
-    // gt1 = GT[finalKeyFrame-initialFrame];
-    // gt0 = GT[firstKeyFrame-initialFrame];
     
+    ofstream corr22,corr23;
+    corr22.open ("/home/master/Desktop/corr22.txt");
+    corr23.open ("/home/master/Desktop/corr23.txt");
+    gt0 = GT[midKeyFrame-initialFrame];
+    gt1 = GT[finalKeyFrame-initialFrame];
     while(i<corr2.size())
     {
 
@@ -251,11 +299,27 @@ int main(int argc, char **argv)
         //  landMarkPosFromPose0 =tempDist0;
         // Vector3d tempDist1 = gt1.inverse()*tempDist_;
         //  landMarkPosFromPose1 = tempDist1;
-        landIdx = myIsam.addLandmark(Vector3d::Zero());
+
+
+        w0  = gt0 * corrVec22[i];
+        w1  = gt1 * corrVec23[i];
+
+        corr22<<w0(0)<<" "<<w0(1)<<" "<<w0(2)<<std::endl;
+        corr23<<w1(0)<<" "<<w1(1)<<" "<<w1(2)<<std::endl;
+
+
         landMarkPosFromPose0 = corrVec22[i];
         landMarkPosFromPose1 = corrVec23[i];
         landMarkCov0 = corrCov22[i];
         landMarkCov1 = corrCov23[i];
+
+        i++;
+
+        if(fabs(w0(0)-w1(0))>outlierTH ||fabs(w0(1)-w1(1))>outlierTH || fabs(w0(2)-w1(2))>outlierTH)
+            continue;
+
+        landIdx = myIsam.addLandmark(Vector3d::Zero());
+     
         #if USE_FIX_LANDMARK_COV
         myIsam.connectLandmark(landMarkPosFromPose0, landIdx, midKeyFrame - initialFrame, LandMarkCov);
         myIsam.connectLandmark(landMarkPosFromPose1, landIdx, finalKeyFrame - initialFrame, LandMarkCov);
@@ -264,8 +328,10 @@ int main(int argc, char **argv)
         myIsam.connectLandmark(landMarkPosFromPose1, landIdx, finalKeyFrame - initialFrame, landMarkCov1);
         #endif
 
-        i++;
     }
+    corr22.close();
+    corr23.close();
+   
    
     //for(  i = 0; i < myIsam.landmarks.size(); i++) cout << myIsam.landmarks[i]->value() << endl;
     //Optimize the Graph
